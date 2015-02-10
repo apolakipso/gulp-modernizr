@@ -12,7 +12,7 @@ module.exports = function (fileName, opt) {
 
 	// Ensure fileName exists
 	if (typeof fileName === "undefined") {
-		fileName = opt ? opt.dest : DEFAULT_FILE_NAME;
+		fileName = DEFAULT_FILE_NAME;
 	} else if (typeof fileName === typeof {}) {
 		opt = fileName;
 		fileName = DEFAULT_FILE_NAME;
@@ -43,18 +43,15 @@ module.exports = function (fileName, opt) {
 
 		// Return if null
 		if (file.isNull()) {
-			stream.push(file);
-			return callback();
+			return;
 		}
 
 		// No stream support (yet?)
 		if (file.isStream()) {
-			stream.emit("error", new gutil.PluginError({
+			return stream.emit("error", new gutil.PluginError({
 				plugin: PLUGIN_NAME,
 				message: "Streaming not supported"
 			}));
-
-			return callback();
 		}
 
 		// Set first file
@@ -65,12 +62,13 @@ module.exports = function (fileName, opt) {
 		// Save buffer for later use
 		opt.files.src.push(file);
 
-		return callback();
+		callback();
 	}
 
-	function generateModernizr(callback) {
+	function generateModernizr() {
+
 		if (opt.files.src.length === 0) {
-			return callback();
+			return;
 		}
 
 		// Call customizr
@@ -94,8 +92,6 @@ module.exports = function (fileName, opt) {
 
 			// Pass data along
 			stream.push(file);
-
-			return callback();
 		});
 	}
 
